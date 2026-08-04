@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ahornwölfe — Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --leinen: #f1e6c8;
+    --leinen-dark: #e3d3a8;
+    --tinte: #2b2018;
+    --blau-dunkel: #17324a;
+    --gold: #c9973a;
+    --rost: #8b2f1e;
+    --tanne: #3e5a2f;
+    --linie: #a8946a;
+    --gruen-ok: #3e6b3a;
+    --rot-fehler: #9c2a1e;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--leinen);
+    color: var(--tinte);
+    font-family: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+    line-height: 1.5;
+  }
+
+  header {
+    background: linear-gradient(160deg, var(--blau-dunkel), #0e2233);
+    color: var(--leinen);
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    border-bottom: 3px solid var(--gold);
+  }
+
+  header h1 {
+    font-family: 'Cinzel', serif;
+    font-size: 1.3rem;
+    letter-spacing: 0.04em;
+    margin: 0;
+    font-weight: 700;
+  }
+
+  .user-box {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.9rem;
+  }
+
+  .user-box img {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid var(--gold);
+  }
+
+  .btn {
+    font-family: 'Cinzel', serif;
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 10px 22px;
+    border-radius: 3px;
+    border: 1.5px solid var(--gold);
+    background: transparent;
+    color: var(--leinen);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .btn:hover { background: var(--gold); color: var(--blau-dunkel); }
+
+  .btn.solid { background: var(--gold); color: var(--blau-dunkel); }
+  .btn.solid:hover { background: transparent; color: var(--gold); }
+
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 32px 24px 80px;
+  }
+
+  #login-screen {
+    max-width: 420px;
+    margin: 80px auto;
+    text-align: center;
+    padding: 40px 32px;
+    background: rgba(255,255,255,0.4);
+    border: 1px solid var(--linie);
+    border-radius: 4px;
+  }
+
+  #login-screen h2 {
+    font-family: 'Cinzel', serif;
+    margin-bottom: 12px;
+  }
+
+  #login-screen p {
+    color: #4a4438;
+    margin-bottom: 24px;
+  }
+
+  #denied-screen {
+    max-width: 420px;
+    margin: 80px auto;
+    text-align: center;
+    padding: 40px 32px;
+    background: rgba(156,42,30,0.08);
+    border: 1px solid var(--rost);
+    border-radius: 4px;
+  }
+
+  #denied-screen h2 { color: var(--rost); font-family: 'Cinzel', serif; }
+
+  fieldset {
+    border: 1px solid var(--linie);
+    border-radius: 4px;
+    padding: 20px 22px 24px;
+    margin: 0 0 28px;
+    background: rgba(255,255,255,0.35);
+  }
+
+  legend {
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    letter-spacing: 0.04em;
+    padding: 0 10px;
+    color: var(--blau-dunkel);
+  }
+
+  label {
+    display: block;
+    font-size: 0.82rem;
+    letter-spacing: 0.03em;
+    color: #5a4a2f;
+    margin: 14px 0 6px;
+  }
+
+  label:first-of-type { margin-top: 0; }
+
+  input[type="text"], textarea {
+    width: 100%;
+    font-family: inherit;
+    font-size: 0.95rem;
+    padding: 10px 12px;
+    border: 1px solid var(--linie);
+    border-radius: 3px;
+    background: #fffaf0;
+    color: var(--tinte);
+    resize: vertical;
+  }
+
+  textarea { min-height: 88px; }
+
+  input[type="text"]:focus, textarea:focus {
+    outline: none;
+    border-color: var(--gold);
+    box-shadow: 0 0 0 2px rgba(201,151,58,0.25);
+  }
+
+  .save-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 8px;
+  }
+
+  .status {
+    font-size: 0.85rem;
+  }
+
+  .status.ok { color: var(--gruen-ok); }
+  .status.err { color: var(--rot-fehler); }
+  .status.busy { color: #6b5a38; }
+
+  #global-msg {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  #global-msg .banner {
+    padding: 12px 16px;
+    border-radius: 3px;
+    font-size: 0.9rem;
+    margin-top: 16px;
+  }
+
+  #global-msg .banner.err {
+    background: rgba(156,42,30,0.1);
+    border: 1px solid var(--rost);
+    color: var(--rost);
+  }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Ahornwölfe — Admin</h1>
+  <div class="user-box" id="user-box"></div>
+</header>
+
+<div id="global-msg"></div>
+
+<div id="login-screen">
+  <h2>Anmeldung erforderlich</h2>
+  <p>Melde dich mit deinem Google-Konto an, um die Website-Texte zu bearbeiten.</p>
+  <button class="btn solid" id="login-btn">Mit Google anmelden</button>
+</div>
+
+<div id="denied-screen" class="hidden">
+  <h2>Kein Zugriff</h2>
+  <p>Dieses Konto hat keine Berechtigung, die Inhalte zu bearbeiten.</p>
+  <button class="btn" id="logout-btn-denied">Abmelden</button>
+</div>
+
+<main id="editor" class="hidden">
+
+  <fieldset id="fs-hero">
+    <legend>Hero</legend>
+    <label for="hero-eyebrow">Eyebrow (kleiner Text über der Überschrift)</label>
+    <input type="text" id="hero-eyebrow" maxlength="120">
+    <label for="hero-title">Titel</label>
+    <input type="text" id="hero-title" maxlength="80">
+    <label for="hero-tagline">Tagline</label>
+    <textarea id="hero-tagline" maxlength="240"></textarea>
+    <div class="save-row">
+      <button class="btn solid" data-save="hero">Speichern</button>
+      <span class="status" id="status-hero"></span>
+    </div>
+  </fieldset>
+
+  <fieldset id="fs-ueber-uns">
+    <legend>Der Baum (Über uns)</legend>
+    <label for="ueber-uns-heading">Überschrift</label>
+    <input type="text" id="ueber-uns-heading" maxlength="80">
+    <label for="ueber-uns-subheading">Unterzeile</label>
+    <input type="text" id="ueber-uns-subheading" maxlength="120">
+    <label for="ueber-uns-paragraph1">Absatz 1</label>
+    <textarea id="ueber-uns-paragraph1" maxlength="800"></textarea>
+    <label for="ueber-uns-paragraph2">Absatz 2</label>
+    <textarea id="ueber-uns-paragraph2" maxlength="800"></textarea>
+    <div class="save-row">
+      <button class="btn solid" data-save="ueber-uns">Speichern</button>
+      <span class="status" id="status-ueber-uns"></span>
+    </div>
+  </fieldset>
+
+  <fieldset id="fs-handwerk">
+    <legend>Handwerk &amp; Lagerleben</legend>
+    <label for="handwerk-heading">Überschrift</label>
+    <input type="text" id="handwerk-heading" maxlength="80">
+    <label for="handwerk-subheading">Unterzeile</label>
+    <input type="text" id="handwerk-subheading" maxlength="120">
+    <label for="handwerk-paragraph1">Absatz 1</label>
+    <textarea id="handwerk-paragraph1" maxlength="800"></textarea>
+    <label for="handwerk-paragraph2">Absatz 2</label>
+    <textarea id="handwerk-paragraph2" maxlength="800"></textarea>
+    <div class="save-row">
+      <button class="btn solid" data-save="handwerk">Speichern</button>
+      <span class="status" id="status-handwerk"></span>
+    </div>
+  </fieldset>
+
+</main>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import {
+    getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import {
+    getFirestore, doc, getDoc, setDoc, serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAcPqekti_9W41h_LszSn3Fz1vYqn2rArc",
+    authDomain: "ahornwoelfe.firebaseapp.com",
+    projectId: "ahornwoelfe",
+    storageBucket: "ahornwoelfe.firebasestorage.app",
+    messagingSenderId: "551486103484",
+    appId: "1:551486103484:web:6b429763e6ba1a858055b9"
+  };
+
+  const ALLOWED_EMAIL = "rohrmart@gmail.com";
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+  const provider = new GoogleAuthProvider();
+
+  const loginScreen = document.getElementById("login-screen");
+  const deniedScreen = document.getElementById("denied-screen");
+  const editor = document.getElementById("editor");
+  const userBox = document.getElementById("user-box");
+  const globalMsg = document.getElementById("global-msg");
+
+  const FIELD_MAP = {
+    hero: {
+      eyebrow: "hero-eyebrow",
+      title: "hero-title",
+      tagline: "hero-tagline"
+    },
+    "ueber-uns": {
+      heading: "ueber-uns-heading",
+      subheading: "ueber-uns-subheading",
+      paragraph1: "ueber-uns-paragraph1",
+      paragraph2: "ueber-uns-paragraph2"
+    },
+    handwerk: {
+      heading: "handwerk-heading",
+      subheading: "handwerk-subheading",
+      paragraph1: "handwerk-paragraph1",
+      paragraph2: "handwerk-paragraph2"
+    }
+  };
+
+  function showBanner(text) {
+    globalMsg.innerHTML = '<div class="banner err">' + text + '</div>';
+  }
+
+  function clearBanner() {
+    globalMsg.innerHTML = "";
+  }
+
+  function showOnly(el) {
+    [loginScreen, deniedScreen, editor].forEach(function (s) {
+      s.classList.toggle("hidden", s !== el);
+    });
+  }
+
+  async function loadAllContent() {
+    for (const [docId, fields] of Object.entries(FIELD_MAP)) {
+      try {
+        const snap = await getDoc(doc(db, "content", docId));
+        if (!snap.exists()) continue;
+        const data = snap.data();
+        for (const [field, elementId] of Object.entries(fields)) {
+          const el = document.getElementById(elementId);
+          if (el && data[field] !== undefined) {
+            el.value = data[field];
+          }
+        }
+      } catch (err) {
+        console.error("Load error (" + docId + "):", err);
+        showBanner("Inhalte für „" + docId + "“ konnten nicht geladen werden.");
+      }
+    }
+  }
+
+  async function saveSection(docId) {
+    const fields = FIELD_MAP[docId];
+    const statusEl = document.getElementById("status-" + docId);
+    const btn = document.querySelector('[data-save="' + docId + '"]');
+    const payload = {};
+    for (const [field, elementId] of Object.entries(fields)) {
+      const el = document.getElementById(elementId);
+      payload[field] = el ? el.value : "";
+    }
+    payload.updatedAt = serverTimestamp();
+
+    btn.disabled = true;
+    statusEl.textContent = "Speichert …";
+    statusEl.className = "status busy";
+
+    try {
+      await setDoc(doc(db, "content", docId), payload, { merge: true });
+      statusEl.textContent = "Gespeichert.";
+      statusEl.className = "status ok";
+    } catch (err) {
+      console.error("Save error (" + docId + "):", err);
+      statusEl.textContent = "Fehler beim Speichern.";
+      statusEl.className = "status err";
+    } finally {
+      btn.disabled = false;
+      setTimeout(function () {
+        statusEl.textContent = "";
+        statusEl.className = "status";
+      }, 4000);
+    }
+  }
+
+  document.querySelectorAll("[data-save]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      saveSection(btn.getAttribute("data-save"));
+    });
+  });
+
+  document.getElementById("login-btn").addEventListener("click", async function () {
+    clearBanner();
+    try {
+      await signInWithPopup(auth, provider);
+    } catch (err) {
+      console.error("Login error:", err);
+      showBanner("Anmeldung fehlgeschlagen. Bitte erneut versuchen.");
+    }
+  });
+
+  document.getElementById("logout-btn-denied").addEventListener("click", function () {
+    signOut(auth);
+  });
+
+  onAuthStateChanged(auth, async function (user) {
+    clearBanner();
+
+    if (!user) {
+      showOnly(loginScreen);
+      userBox.innerHTML = "";
+      return;
+    }
+
+    if (user.email !== ALLOWED_EMAIL) {
+      showOnly(deniedScreen);
+      userBox.innerHTML = "";
+      return;
+    }
+
+    userBox.innerHTML =
+      (user.photoURL ? '<img src="' + user.photoURL + '" alt="">' : "") +
+      "<span>" + (user.displayName || user.email) + "</span>" +
+      '<button class="btn" id="logout-btn">Abmelden</button>';
+
+    document.getElementById("logout-btn").addEventListener("click", function () {
+      signOut(auth);
+    });
+
+    showOnly(editor);
+    await loadAllContent();
+  });
+</script>
+</body>
+</html>
