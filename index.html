@@ -4,18 +4,24 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ahornwölfe — Wikinger-Reenactment</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cinzel+Decorative:wght@700;900&family=Uncial+Antiqua&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
 <style>
   :root {
-    --leinen: #f3eee1;
-    --leinen-dark: #e8dfc9;
-    --tinte: #2b2b2b;
+    --leinen: #f1e6c8;
+    --leinen-dark: #e3d3a8;
+    --pergament: #e8d9ae;
+    --tinte: #2b2018;
     --blau: #1d5c9e;
-    --blau-dunkel: #144270;
-    --ocker: #d9a11e;
-    --rost: #b23a2e;
-    --tanne: #3e6b3a;
-    --linie: #c9bd9e;
-    --knot: #16321a;
+    --blau-dunkel: #17324a;
+    --ocker: #b8860b;
+    --gold: #c9973a;
+    --rost: #8b2f1e;
+    --tanne: #3e5a2f;
+    --linie: #a8946a;
+    --knot: #2c1810;
+    --eisen: #3a3128;
   }
 
   * { box-sizing: border-box; }
@@ -24,10 +30,14 @@
 
   body {
     margin: 0;
-    background: var(--leinen);
+    background:
+      radial-gradient(ellipse at top, rgba(255,250,230,0.35), transparent 60%),
+      linear-gradient(var(--leinen), var(--leinen));
+    background-color: var(--leinen);
     color: var(--tinte);
-    font-family: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
-    line-height: 1.6;
+    font-family: 'IM Fell English', 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+    font-size: 1.06rem;
+    line-height: 1.7;
     overflow-x: hidden;
   }
 
@@ -37,14 +47,37 @@
     inset: 0;
     pointer-events: none;
     z-index: 0;
+    opacity: 0.5;
     background-image:
-      repeating-linear-gradient(0deg, rgba(0,0,0,0.012) 0px, rgba(0,0,0,0.012) 1px, transparent 1px, transparent 3px),
-      repeating-linear-gradient(90deg, rgba(0,0,0,0.012) 0px, rgba(0,0,0,0.012) 1px, transparent 1px, transparent 3px);
+      repeating-linear-gradient(0deg, rgba(80,60,30,0.045) 0px, rgba(80,60,30,0.045) 1px, transparent 1px, transparent 3px),
+      repeating-linear-gradient(90deg, rgba(80,60,30,0.045) 0px, rgba(80,60,30,0.045) 1px, transparent 1px, transparent 3px),
+      radial-gradient(circle at 12% 8%, rgba(139,47,30,0.06), transparent 22%),
+      radial-gradient(circle at 88% 92%, rgba(139,47,30,0.06), transparent 22%),
+      radial-gradient(circle at 92% 15%, rgba(60,40,15,0.05), transparent 18%),
+      radial-gradient(circle at 6% 85%, rgba(60,40,15,0.05), transparent 18%);
+  }
+
+  body::after {
+    content: "ᛗᚨᛚᚨᚾᛞ";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Uncial Antiqua', serif;
+    font-size: min(38vw, 480px);
+    letter-spacing: 0.05em;
+    color: var(--eisen);
+    opacity: 0.035;
+    transform: rotate(-8deg);
+    white-space: nowrap;
   }
 
   .rune-font {
     font-family: 'Cinzel', 'Trajan Pro', 'Copperplate', serif;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.14em;
   }
 
   h1, h2, h3, .display {
@@ -52,7 +85,12 @@
     font-weight: 700;
     letter-spacing: 0.06em;
     color: var(--blau-dunkel);
+    text-shadow: 0 1px 0 rgba(255,255,255,0.3), 0 2px 3px rgba(43,32,24,0.12);
     margin: 0;
+  }
+
+  .hero h1 {
+    font-family: 'Cinzel Decorative', 'Cinzel', serif;
   }
 
   a { color: var(--rost); }
@@ -82,16 +120,19 @@
 
   /* ---------- HERO ---------- */
   .hero {
-    padding: 72px 24px 40px;
+    padding: 72px 24px 44px;
     text-align: center;
     position: relative;
     z-index: 1;
+    border-top: 3px double var(--linie);
+    border-bottom: 3px double var(--linie);
+    margin: 18px 12px 0;
   }
 
   .hero .eyebrow {
     font-family: 'Cinzel', serif;
     font-size: 0.72rem;
-    letter-spacing: 0.35em;
+    letter-spacing: 0.4em;
     text-transform: uppercase;
     color: var(--ocker);
     margin-bottom: 18px;
@@ -99,16 +140,22 @@
 
   .hero .eyebrow::before,
   .hero .eyebrow::after {
-    content: "✳";
+    content: "ᛝ";
     color: var(--rost);
-    margin: 0 10px;
-    font-size: 0.8em;
+    margin: 0 12px;
+    font-size: 0.9em;
   }
 
   .banner-frame {
     max-width: 320px;
     margin: 0 auto 32px;
-    filter: drop-shadow(0 18px 30px rgba(20, 66, 112, 0.22));
+    padding: 10px;
+    background:
+      linear-gradient(var(--leinen), var(--leinen)) padding-box,
+      repeating-linear-gradient(135deg, var(--rost) 0 6px, var(--ocker) 6px 12px) border-box;
+    border: 5px solid transparent;
+    border-radius: 3px;
+    filter: drop-shadow(0 18px 30px rgba(20, 12, 6, 0.28));
   }
 
   .banner-frame img {
@@ -117,14 +164,17 @@
   }
 
   .hero h1 {
-    font-size: clamp(2.4rem, 7vw, 3.6rem);
-    line-height: 1.05;
+    font-size: clamp(2.6rem, 7.5vw, 3.9rem);
+    line-height: 1.08;
     margin-bottom: 14px;
+    letter-spacing: 0.03em;
   }
 
   .hero .tagline {
-    font-size: 1.08rem;
-    color: #4a4438;
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    letter-spacing: 0.04em;
+    color: #5a4a2f;
     max-width: 480px;
     margin: 0 auto;
     font-style: italic;
@@ -145,19 +195,29 @@
   }
 
   .section-glyph {
-    font-size: 1.6rem;
+    font-size: 1.7rem;
     color: var(--rost);
     flex-shrink: 0;
     line-height: 1;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.35);
   }
 
   .section-head h2 {
-    font-size: 1.6rem;
+    font-size: 1.65rem;
+  }
+
+  .section-head h2::first-letter {
+    font-family: 'Cinzel Decorative', 'Cinzel', serif;
+    font-size: 1.35em;
+    color: var(--rost);
   }
 
   .section-sub {
-    color: #6b6252;
-    font-size: 0.95rem;
+    font-family: 'Cinzel', serif;
+    letter-spacing: 0.06em;
+    color: #6b5a38;
+    font-size: 0.82rem;
+    text-transform: uppercase;
     margin-top: -18px;
     margin-bottom: 26px;
     margin-left: 42px;
@@ -181,15 +241,16 @@
   }
 
   .beast-card {
-    background: rgba(255,255,255,0.4);
+    background: rgba(255,250,235,0.45);
     border: 1px solid var(--linie);
-    border-radius: 4px;
+    border-radius: 2px;
     padding: 26px 22px;
     position: relative;
+    box-shadow: inset 0 0 0 1px rgba(139,47,30,0.06), 0 2px 6px rgba(43,32,24,0.06);
   }
 
-  .beast-card.red { border-top: 3px solid var(--rost); }
-  .beast-card.yellow { border-top: 3px solid var(--ocker); }
+  .beast-card.red { border-top: 4px double var(--rost); }
+  .beast-card.yellow { border-top: 4px double var(--ocker); }
 
   .beast-card h3 {
     font-size: 1.05rem;
@@ -209,20 +270,26 @@
   .contact-block {
     text-align: center;
     padding: 48px 32px;
-    background: var(--blau-dunkel);
-    border-radius: 6px;
+    background:
+      radial-gradient(ellipse at top, rgba(255,255,255,0.05), transparent 55%),
+      linear-gradient(160deg, var(--blau-dunkel), #0e2233);
+    border: 2px solid var(--gold);
+    border-radius: 3px;
     color: var(--leinen);
+    box-shadow: inset 0 0 0 6px rgba(0,0,0,0.18), 0 10px 26px rgba(20,12,6,0.25);
   }
 
   .contact-block h2 {
     color: var(--leinen);
     margin-bottom: 12px;
+    text-shadow: 0 1px 0 rgba(0,0,0,0.4);
   }
 
   .rune-mark {
-    font-size: 1.8rem;
-    letter-spacing: 0.3em;
-    color: var(--ocker);
+    font-family: 'Uncial Antiqua', serif;
+    font-size: 1.9rem;
+    letter-spacing: 0.35em;
+    color: var(--gold);
     margin-bottom: 18px;
   }
 
@@ -241,25 +308,25 @@
 
   .btn {
     display: inline-block;
-    padding: 12px 28px;
-    border: 1.5px solid var(--ocker);
-    border-radius: 3px;
+    padding: 12px 30px;
+    border: 1.5px solid var(--gold);
+    border-radius: 2px;
     color: var(--leinen);
     text-decoration: none;
     font-family: 'Cinzel', serif;
     font-size: 0.8rem;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
     transition: all 0.25s ease;
   }
 
   .btn:hover {
-    background: var(--ocker);
+    background: var(--gold);
     color: var(--blau-dunkel);
   }
 
   .btn.solid {
-    background: var(--ocker);
+    background: var(--gold);
     color: var(--blau-dunkel);
   }
   .btn.solid:hover {
@@ -271,15 +338,20 @@
   footer {
     text-align: center;
     padding: 32px 24px 48px;
-    font-size: 0.8rem;
-    color: #8a8069;
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    color: #7a6b48;
+    border-top: 1px solid var(--linie);
+    margin: 0 40px;
     position: relative;
     z-index: 1;
   }
 
   footer .fylfot {
-    color: var(--blau);
-    font-size: 1.1rem;
+    font-family: 'Uncial Antiqua', serif;
+    color: var(--rost);
+    font-size: 1.3rem;
     margin-bottom: 10px;
     display: block;
   }
@@ -361,7 +433,7 @@
     </div>
     <div class="section-sub">Womit wir uns beschäftigen</div>
     <div class="origin-body">
-      <p>Von der Rohhaut-Laterne bis zur historischen Truhe — bei uns entsteht vieles mit den eigenen Händen, so nah wie möglich an historischem Material und Machart. Wir orientieren uns an zeitgenössischen Quellen und dem, was sich im Lager bewährt.</p>
+      <p>Von der Rohhaut-Laterne bis zum Zeltdach — bei uns entsteht vieles mit den eigenen Händen, so nah wie möglich an historischem Material und Machart. Wir orientieren uns an zeitgenössischen Quellen und dem, was sich im Lager bewährt.</p>
       <p>Wer mitmachen will, muss kein fertiges Handwerk mitbringen — nur Lust, es sich zu erarbeiten.</p>
     </div>
   </section>
