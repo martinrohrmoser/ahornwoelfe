@@ -171,6 +171,35 @@
     box-shadow: 0 0 0 2px rgba(201,151,58,0.25);
   }
 
+  .image-field {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border: 1px solid var(--linie);
+    border-radius: 3px;
+    background: #fffaf0;
+  }
+
+  .image-preview {
+    width: 96px;
+    height: 96px;
+    object-fit: cover;
+    border-radius: 3px;
+    border: 1px solid var(--linie);
+    background: #f1e6cf;
+    display: none;
+  }
+
+  .image-preview.has-image { display: block; }
+
+  .image-field input[type="file"] {
+    font-family: inherit;
+    font-size: 0.85rem;
+    flex: 1 1 200px;
+  }
+
   .save-row {
     display: flex;
     align-items: center;
@@ -239,6 +268,12 @@
     <input type="text" id="hero-title" maxlength="80">
     <label for="hero-tagline">Tagline</label>
     <textarea id="hero-tagline" maxlength="240"></textarea>
+    <label>Banner-Bild</label>
+    <div class="image-field" data-image-field="hero">
+      <img class="image-preview" id="hero-image-preview" alt="Vorschau">
+      <input type="file" accept="image/*" id="hero-image-input">
+      <button type="button" class="btn" data-remove-image="hero">Bild entfernen</button>
+    </div>
     <div class="save-row">
       <button class="btn solid" data-save="hero">Speichern</button>
       <span class="status" id="status-hero"></span>
@@ -255,6 +290,12 @@
     <textarea id="ueber-uns-paragraph1" maxlength="800"></textarea>
     <label for="ueber-uns-paragraph2">Absatz 2</label>
     <textarea id="ueber-uns-paragraph2" maxlength="800"></textarea>
+    <label>Bild (optional)</label>
+    <div class="image-field" data-image-field="ueber-uns">
+      <img class="image-preview" id="ueber-uns-image-preview" alt="Vorschau">
+      <input type="file" accept="image/*" id="ueber-uns-image-input">
+      <button type="button" class="btn" data-remove-image="ueber-uns">Bild entfernen</button>
+    </div>
     <div class="save-row">
       <button class="btn solid" data-save="ueber-uns">Speichern</button>
       <span class="status" id="status-ueber-uns"></span>
@@ -271,6 +312,12 @@
     <textarea id="handwerk-paragraph1" maxlength="800"></textarea>
     <label for="handwerk-paragraph2">Absatz 2</label>
     <textarea id="handwerk-paragraph2" maxlength="800"></textarea>
+    <label>Bild (optional)</label>
+    <div class="image-field" data-image-field="handwerk">
+      <img class="image-preview" id="handwerk-image-preview" alt="Vorschau">
+      <input type="file" accept="image/*" id="handwerk-image-input">
+      <button type="button" class="btn" data-remove-image="handwerk">Bild entfernen</button>
+    </div>
     <div class="save-row">
       <button class="btn solid" data-save="handwerk">Speichern</button>
       <span class="status" id="status-handwerk"></span>
@@ -330,6 +377,10 @@
     }
   };
 
+  // Aktueller Bild-Wert je Sektion: Data-URL-String, null (kein Bild) oder
+  // undefined (unverändert seit dem Laden -> beim Speichern nicht anfassen).
+  const imageState = {};
+
   function showBanner(text) {
     globalMsg.innerHTML = '<div class="banner err">' + text + '</div>';
   }
@@ -344,6 +395,103 @@
     });
   }
 
+  function setImagePreview(docId, dataUrl) {
+    const preview = document.getElementById(docId + "-image-preview");
+    if (!preview) return;
+    if (dataUrl) {
+      preview.src = dataUrl;
+      preview.classList.add("has-image");
+    } else {
+      preview.src = "";
+      preview.classList.remove("has-image");
+    }
+  }
+
+  // Skaliert ein Bild clientseitig auf max. 1000px Breite/Höhe und
+  // komprimiert es als JPEG, damit es sicher unter Firestores 1-MB-
+  // Dokumentlimit passt (Base64 kostet ~33% Overhead gegenüber Rohbytes).
+  function resizeAndCompressImage(file, maxDim, quality) {
+    return new Promise(function (resolve, reject) {
+      const reader = new FileReader();
+      reader.onerror = function () { reject(new Error("Datei konnte nicht gelesen werden.")); };
+      reader.onload = function () {
+        const img = new Image();
+        img.onerror = function () { reject(new Error("Bild konnte nicht dekodiert werden.")); };
+        img.onload = function () {
+          let w = img.width;
+          let h = img.height;
+          if (w > maxDim || h > maxDim) {
+            if (w >= h) {
+              h = Math.round(h * (maxDim / w));
+              w = maxDim;
+            } else {
+              w = Math.round(w * (maxDim / h));
+              h = maxDim;
+            }
+          }
+          const canvas = document.createElement("canvas");
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, w, h);
+          resolve(canvas.toDataURL("image/jpeg", quality));
+        };
+        img.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function wireImageField(docId) {
+    const input = document.getElementById(docId + "-image-input");
+    const removeBtn = document.querySelector('[data-remove-image="' + docId + '"]');
+    if (input) {
+      input.addEventListener("change", async function () {
+        const file = input.files && input.files[0];
+        input.value = "";
+        if (!file) return;
+        const statusEl = document.getElementById("status-" + docId);
+        if (statusEl) {
+          statusEl.textContent = "Bild wird verarbeitet …";
+          statusEl.className = "status busy";
+        }
+        try {
+          let dataUrl = await resizeAndCompressImage(file, 1000, 0.82);
+          // Falls das Bild trotz Skalierung noch zu groß für Firestore
+          // wäre (>~700 KB als Base64), nochmal stärker komprimieren.
+          if (dataUrl.length > 700000) {
+            dataUrl = await resizeAndCompressImage(file, 800, 0.65);
+          }
+          imageState[docId] = dataUrl;
+          setImagePreview(docId, dataUrl);
+          if (statusEl) {
+            statusEl.textContent = "Bild bereit — nicht vergessen zu speichern.";
+            statusEl.className = "status ok";
+          }
+        } catch (err) {
+          console.error("Bildverarbeitung fehlgeschlagen (" + docId + "):", err);
+          if (statusEl) {
+            statusEl.textContent = "Bild konnte nicht verarbeitet werden.";
+            statusEl.className = "status err";
+          }
+        }
+      });
+    }
+    if (removeBtn) {
+      removeBtn.addEventListener("click", function () {
+        imageState[docId] = null;
+        setImagePreview(docId, null);
+        const statusEl = document.getElementById("status-" + docId);
+        if (statusEl) {
+          statusEl.textContent = "Bild wird beim Speichern entfernt.";
+          statusEl.className = "status ok";
+        }
+      });
+    }
+  }
+
+  Object.keys(FIELD_MAP).forEach(wireImageField);
+
   async function loadAllContent() {
     for (const [docId, fields] of Object.entries(FIELD_MAP)) {
       try {
@@ -356,6 +504,11 @@
             el.value = data[field];
           }
         }
+        if (data.image) {
+          setImagePreview(docId, data.image);
+        }
+        // imageState bleibt undefined -> beim Speichern nicht anfassen,
+        // solange die Person nichts hoch- oder entfernt hat.
       } catch (err) {
         console.error("Load error (" + docId + "):", err);
         showBanner("Inhalte für „" + docId + "“ konnten nicht geladen werden.");
@@ -371,6 +524,12 @@
     for (const [field, elementId] of Object.entries(fields)) {
       const el = document.getElementById(elementId);
       payload[field] = el ? el.value : "";
+    }
+    // Bild nur ins Payload aufnehmen, wenn die Person es in dieser Sitzung
+    // geändert (hochgeladen oder entfernt) hat. imageState[docId] === null
+    // bedeutet "entfernen"; ein Data-URL-String bedeutet "neues Bild".
+    if (Object.prototype.hasOwnProperty.call(imageState, docId)) {
+      payload.image = imageState[docId];
     }
     payload.updatedAt = serverTimestamp();
 
